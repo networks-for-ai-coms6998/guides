@@ -1,0 +1,27 @@
+name: Shell scripts
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  bash-3.2-compat:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run test harness under macOS system bash (3.2)
+        run: |
+          export PATH="/bin:$PATH"
+          bash --version
+          bash scripts/tests/test_setup_gpu.sh
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+      - name: Run shellcheck on all scripts
+        run: shellcheck scripts/*.sh scripts/tests/*.sh
