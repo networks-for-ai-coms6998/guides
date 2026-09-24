@@ -42,7 +42,7 @@ here needs course staff involvement.
 
 ## What you need to do by hand
 
-Just these three things — everything else is one script.
+Just these four things — everything else is one script.
 
 ### 1. Create a Google Cloud account and redeem the free trial
 
@@ -58,6 +58,13 @@ days.
 
 ```bash
 gcloud auth login
+```
+
+### 4. Get this repo
+
+```bash
+git clone https://github.com/networks-for-ai-coms6998/guides.git
+cd guides
 ```
 
 ## Then run one script
@@ -87,11 +94,11 @@ days). Re-run the script once that's done.
 The single biggest way people blow through their $300 credit is leaving
 a GPU instance running overnight or over a weekend by accident.
 
-- If you'll use it again soon: `bash scripts/stop-gpu-vm.sh` — this stops
-  billing for compute, but the attached disk keeps billing a small
-  amount for as long as the VM exists.
-- If you're fully done with it: `bash scripts/delete-gpu-vm.sh` — this
-  removes the disk too, so nothing keeps billing.
+-   If you'll use it again soon: `bash scripts/stop-gpu-vm.sh` — this
+    stops billing for compute, but the attached disk keeps billing a
+    small amount for as long as the VM exists.
+-   If you're fully done with it: `bash scripts/delete-gpu-vm.sh` — this
+    removes the disk too, so nothing keeps billing.
 
 When in doubt, delete it — recreating it later takes under two minutes.
 
@@ -162,16 +169,19 @@ EOF
 # IMPORTANT: the VM this creates bills your personal GCP account by the
 # hour while running. Use stop-gpu-vm.sh or delete-gpu-vm.sh the moment
 # you're done -- an idle GPU VM burns through your $300 credit fast.
+#
+# NOTE ON --dry-run: only the final `gcloud compute instances create` is
+# skipped. Project creation, billing linkage, and API enablement are real,
+# billable-account-mutating actions even with --dry-run, since they're
+# idempotent and there's no meaningful way to "preview" them separately.
 
 set -euo pipefail
 
 ZONE="us-central1-a"
 GPU_TYPE="nvidia-tesla-t4"
-MACHINE_TYPE="n1-standard-4"
 VM_NAME="coms6998-gpu"
 DRY_RUN=false
 
-bold() { printf '\033[1m%s\033[0m\n' "$1"; }
 step() { printf '\n\033[1;34m==> %s\033[0m\n' "$1"; }
 ok()   { printf '    \033[1;32m✓\033[0m %s\n' "$1"; }
 warn() { printf '    \033[1;33m!\033[0m %s\n' "$1"; }
@@ -183,6 +193,9 @@ while [[ $# -gt 0 ]]; do
         --dry-run) DRY_RUN=true; shift ;;
         -h|--help)
             echo "Usage: $0 [-z ZONE] [-g GPU_TYPE] [--dry-run]"
+            echo "  -g accepts: nvidia-tesla-t4 (default), nvidia-l4, nvidia-tesla-a100"
+            echo "  --dry-run only skips the final VM-create step -- project"
+            echo "  creation/billing-link/API-enable still run for real."
             exit 0
             ;;
         *) echo "Unknown argument: $1" >&2; exit 1 ;;
@@ -190,6 +203,28 @@ while [[ $# -gt 0 ]]; do
 done
 
 REGION="${ZONE%-*}"
+
+# GPU type determines both the quota metric to check and a compatible
+# machine family -- getting this wrong either checks the wrong quota
+# (false pass/fail) or fails at VM creation with a family mismatch.
+case "$GPU_TYPE" in
+    nvidia-tesla-t4)
+        QUOTA_METRIC="NVIDIA_T4_GPUS"
+        MACHINE_TYPE="n1-standard-4"
+        ;;
+    nvidia-l4)
+        QUOTA_METRIC="NVIDIA_L4_GPUS"
+        MACHINE_TYPE="g2-standard-4"
+        ;;
+    nvidia-tesla-a100)
+        QUOTA_METRIC="NVIDIA_A100_GPUS"
+        MACHINE_TYPE="a2-highgpu-1g"
+        ;;
+    *)
+        echo "Unsupported --gpu-type: $GPU_TYPE (supported: nvidia-tesla-t4, nvidia-l4, nvidia-tesla-a100)" >&2
+        exit 1
+        ;;
+esac
 
 # ---------------------------------------------------------------------------
 step "GPU setup for coms6998 -- what this script does"
@@ -294,7 +329,6 @@ ok "Compute Engine API enabled"
 # ---------------------------------------------------------------------------
 step "4. Checking GPU quota in $REGION"
 # ---------------------------------------------------------------------------
-QUOTA_METRIC="NVIDIA_T4_GPUS"
 GPU_QUOTA="$(gcloud compute regions describe "$REGION" --project="$CURRENT_PROJECT" --format=json \
     | python3 -c "import json,sys; q={x['metric']: x['limit'] for x in json.load(sys.stdin)['quotas']}; print(int(q.get('$QUOTA_METRIC', 0)))")"
 
@@ -304,7 +338,7 @@ if [[ "$GPU_QUOTA" -lt 1 ]]; then
     warn "  1. If you're still on the free trial, GCP will NOT grant GPU"
     warn "     quota until you upgrade to a paid Cloud Billing account"
     warn "     (this preserves your \$300 credit, it does not charge you):"
-    warn "     https://cloud.google.com/billing/docs/how-to/upgrade"
+    warn "     https://cloud.google.com/free/docs/free-cloud-features#how-to-upgrade"
     warn "  2. Then request GPU quota (can take 1-2 business days):"
     warn "     https://cloud.google.com/compute/resource-usage#gpu_quota"
     warn "Re-run this script once quota shows as approved."
@@ -315,13 +349,18 @@ ok "GPU quota OK ($GPU_QUOTA available for $QUOTA_METRIC in $REGION)"
 # ---------------------------------------------------------------------------
 step "5. Creating the GPU VM"
 # ---------------------------------------------------------------------------
+# pytorch-2-9-cu129-ubuntu-2204-nvidia-580: a currently-supported (EOL
+# 2028-08-04) PyTorch DLVM family -- NOT common-cu124, which is (a) a
+# Base image with no PyTorch preinstalled and (b) a deprecated
+# Debian-11-based family (EOL 2026-07-24). Verified directly against
+# Google's current Deep Learning VM image docs, not assumed.
 CMD=(gcloud compute instances create "$VM_NAME"
     --project="$CURRENT_PROJECT"
     --zone="$ZONE"
     --machine-type="$MACHINE_TYPE"
     --accelerator="type=$GPU_TYPE,count=1"
     --maintenance-policy=TERMINATE
-    --image-family=common-cu124
+    --image-family=pytorch-2-9-cu129-ubuntu-2204-nvidia-580
     --image-project=deeplearning-platform-release
     --boot-disk-size=100GB
 )
@@ -331,7 +370,13 @@ if $DRY_RUN; then
     exit 0
 fi
 
-"${CMD[@]}"
+if ! "${CMD[@]}"; then
+    warn "VM creation failed. If the error above mentioned"
+    warn "ZONE_RESOURCE_POOL_EXHAUSTED, that zone is temporarily out of"
+    warn "this GPU type -- retry with a different --zone (e.g."
+    warn "-z us-central1-b or -z us-central1-c)."
+    exit 1
+fi
 
 # ---------------------------------------------------------------------------
 step "Done"
@@ -339,6 +384,11 @@ step "Done"
 cat <<EOF
 SSH in with:
   gcloud compute ssh $VM_NAME --zone=$ZONE --project=$CURRENT_PROJECT
+
+Once connected, confirm the GPU and PyTorch are visible:
+  nvidia-smi
+  python3 -c "import torch; print(torch.cuda.is_available())"
+If nvidia-smi doesn't find a GPU, run: sudo /opt/deeplearning/install-driver.sh
 
 REMEMBER: stop-gpu-vm.sh or delete-gpu-vm.sh the moment you're done for
 a session -- this VM bills by the hour while running. Stopping halts
