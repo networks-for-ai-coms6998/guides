@@ -68,8 +68,9 @@ It will, in order:
 IMPORTANT -- read this part twice: once the VM is created, it bills your
 personal GCP account BY THE HOUR while it's running, whether or not
 you're actively using it. Run stop-gpu-vm.sh or delete-gpu-vm.sh the
-moment you're done for a session. When in doubt, delete it -- recreating
-it later takes under two minutes.
+moment you're done for a session. Note: stop-gpu-vm.sh stops compute
+billing but the attached disk keeps billing until you delete-gpu-vm.sh.
+When in doubt, delete it -- recreating it later takes under two minutes.
 
 Prerequisites this script assumes you've already done (see
 ../gcp-personal-gpu.md if not):
@@ -196,5 +197,6 @@ SSH in with:
   gcloud compute ssh $VM_NAME --zone=$ZONE --project=$CURRENT_PROJECT
 
 REMEMBER: stop-gpu-vm.sh or delete-gpu-vm.sh the moment you're done for
-a session -- this VM bills by the hour while running.
+a session -- this VM bills by the hour while running. Stopping halts
+compute billing, but the attached disk keeps billing until deleted.
 EOF
