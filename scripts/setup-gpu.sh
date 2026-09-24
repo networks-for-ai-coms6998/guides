@@ -78,10 +78,13 @@ Prerequisites this script assumes you've already done (see
   - Run \`gcloud auth login\` (or \`gcloud init\`).
 EOF
 read -r -p "Ready to proceed? [y/N] " confirm
-if [[ "${confirm,,}" != "y" ]]; then
-    echo "Stopping. Come back once you're ready."
-    exit 0
-fi
+case "$confirm" in
+    [Yy]) ;;
+    *)
+        echo "Stopping. Come back once you're ready."
+        exit 0
+        ;;
+esac
 
 # ---------------------------------------------------------------------------
 step "1. Checking gcloud authentication"
@@ -103,9 +106,9 @@ if [[ "$CURRENT_PROJECT" == "(unset)" ]]; then
 fi
 if [[ -n "$CURRENT_PROJECT" ]]; then
     read -r -p "Use current project '$CURRENT_PROJECT'? [Y/n] " use_current
-    if [[ "${use_current,,}" == "n" ]]; then
-        CURRENT_PROJECT=""
-    fi
+    case "$use_current" in
+        [Nn]*) CURRENT_PROJECT="" ;;
+    esac
 fi
 
 if [[ -z "$CURRENT_PROJECT" ]]; then
