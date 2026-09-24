@@ -50,6 +50,8 @@ anything**, it just removes the free-trial GPU-quota block and preserves
 your $300 credit — then requesting GPU quota, which can take 1-2 business
 days). Re-run the script once that's done.
 
+**⚠️ Important:** Once the VM is created, it bills by the hour whether or not you're using it — make sure to stop or delete it when you're done (see below).
+
 ## Turn it off the moment you're done — this is the part that matters
 
 **A running GPU VM bills by the hour whether or not you're using it.**
