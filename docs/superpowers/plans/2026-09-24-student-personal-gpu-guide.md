@@ -17,6 +17,7 @@
 - Do not claim the script can automate the free-trial → paid Cloud Billing upgrade — that's a manual, consent-requiring click in the Console. The script detects the resulting zero-GPU-quota symptom and tells the student exactly what to do, then exits non-zero so they can re-run once fixed.
 - `setup-gpu.sh` prints a `step`/`ok`/`warn`-style explanation banner and asks for confirmation *before* doing anything, the same pattern `pygrader/scripts/onboard-ta.sh` uses for TA onboarding — this is a deliberate consistency choice, not incidental.
 - `MD013` (line length) is disabled in this repo's `.markdownlint.yaml` — no need to hand-wrap lines.
+- All bash scripts here must run under **bash 3.2** (macOS's stock `/bin/bash`, unchanged since Apple stopped shipping GPLv3 code) — no bash-4+-only features (`${var,,}`/`${var^^}` case conversion, associative arrays, `mapfile`). Use `case "$var" in [Yy]*) ... ;; esac`-style pattern matching for case-insensitive comparisons instead. This was found and fixed during Task 2's implementation, when a subagent caught the original draft's `${confirm,,}` crashing under macOS's default bash with "bad substitution" — `bash -n` does not catch this, since it's a runtime failure, not a parse error.
 
 ---
 
@@ -221,10 +222,13 @@ Prerequisites this script assumes you've already done (see
   - Run \`gcloud auth login\` (or \`gcloud init\`).
 EOF
 read -r -p "Ready to proceed? [y/N] " confirm
-if [[ "${confirm,,}" != "y" ]]; then
-    echo "Stopping. Come back once you're ready."
-    exit 0
-fi
+case "$confirm" in
+    [Yy]) ;;
+    *)
+        echo "Stopping. Come back once you're ready."
+        exit 0
+        ;;
+esac
 
 # ---------------------------------------------------------------------------
 step "1. Checking gcloud authentication"
@@ -246,9 +250,9 @@ if [[ "$CURRENT_PROJECT" == "(unset)" ]]; then
 fi
 if [[ -n "$CURRENT_PROJECT" ]]; then
     read -r -p "Use current project '$CURRENT_PROJECT'? [Y/n] " use_current
-    if [[ "${use_current,,}" == "n" ]]; then
-        CURRENT_PROJECT=""
-    fi
+    case "$use_current" in
+        [Nn]*) CURRENT_PROJECT="" ;;
+    esac
 fi
 
 if [[ -z "$CURRENT_PROJECT" ]]; then
