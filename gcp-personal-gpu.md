@@ -11,7 +11,7 @@ here needs course staff involvement.
 
 ## What you need to do by hand
 
-Just these three things — everything else is one script.
+Just these four things — everything else is one script.
 
 ### 1. Create a Google Cloud account and redeem the free trial
 
@@ -27,6 +27,13 @@ days.
 
 ```bash
 gcloud auth login
+```
+
+### 4. Get this repo
+
+```bash
+git clone https://github.com/networks-for-ai-coms6998/guides.git
+cd guides
 ```
 
 ## Then run one script
@@ -58,11 +65,11 @@ days). Re-run the script once that's done.
 The single biggest way people blow through their $300 credit is leaving
 a GPU instance running overnight or over a weekend by accident.
 
-- If you'll use it again soon: `bash scripts/stop-gpu-vm.sh` — this stops
-  billing for compute, but the attached disk keeps billing a small
-  amount for as long as the VM exists.
-- If you're fully done with it: `bash scripts/delete-gpu-vm.sh` — this
-  removes the disk too, so nothing keeps billing.
+-   If you'll use it again soon: `bash scripts/stop-gpu-vm.sh` — this
+    stops billing for compute, but the attached disk keeps billing a
+    small amount for as long as the VM exists.
+-   If you're fully done with it: `bash scripts/delete-gpu-vm.sh` — this
+    removes the disk too, so nothing keeps billing.
 
 When in doubt, delete it — recreating it later takes under two minutes.
 

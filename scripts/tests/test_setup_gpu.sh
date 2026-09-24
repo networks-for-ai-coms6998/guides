@@ -53,6 +53,10 @@ run_case() {
     # empty second line accepts the default value at the "New project ID"
     # prompt (Step 2 runs -- and so needs this -- before the quota check
     # in Step 4, so every case that gets past Step 1 needs both lines).
+    # extra_args intentionally holds space-separated flags (e.g. "-g
+    # nvidia-l4 --dry-run"); quoting it would pass it as one argument
+    # instead of splitting it into flags.
+    # shellcheck disable=SC2086
     output="$(printf 'y\n\n' | PATH="$STUB_BIN:$PATH" bash "$SCRIPT_DIR/../setup-gpu.sh" $extra_args 2>&1)"
     actual_exit=$?
     set -e
