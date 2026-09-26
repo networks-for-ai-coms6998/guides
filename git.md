@@ -6,8 +6,9 @@ keeping track of the changes you have made to your code.
 
 In this course you use Git and GitHub for your assignments: you get your
 starter code from a repository that the teaching staff creates for you, you
-commit your work to it, and you submit by pushing to it. See the
-[Homework Workflow Guide](homework_workflow.md) for how that works end to end.
+commit your work to it, and you submit by pushing to it. See
+[Using git on the server](git-on-the-server.md) and [Submission](submission.md) for how that
+works end to end.
 This guide covers the Git basics you need.
 
 ## Configure your Git environment

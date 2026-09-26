@@ -33,7 +33,8 @@ well before the deadline (more than a few hours), not the night before.
 
 Do **not** create your own virtual environment and do **not** run
 `pip install torch`. PyTorch is several GB and will blow through your disk
-quota (1 GB soft, 2 GB hard). A ready-made environment with `torch`,
+quota (500 MB soft, 1 GB hard); an attempt to install it fails part way and can leave
+your account over quota. A ready-made environment with `torch`,
 `transformers`, and the TinyLlama weights is shared by everyone. Load it
 with:
 
@@ -148,7 +149,7 @@ If you started something by mistake, or a job is stuck, run
     running at 1 a.m.; such a job will not be started.
 -   The login node cannot load the model: it has only 512 MB of RAM. Always
     run the model through `srun` or `sbatch`.
--   Your home directory has a 1 GB soft / 2 GB hard disk quota.
+-   Your home directory has a 500 MB soft / 1 GB hard disk quota.
 -   `/tmp` is local to each machine, so the login node and the GPU machine
     do not share it. Keep your scripts and outputs under your **home
     directory**, which is visible on both.
@@ -285,7 +286,7 @@ your disk quota and do not belong in the repo.
 | `command not found: python`, or `ModuleNotFoundError: No module named 'torch'` | You did not run `source /home/coms6998-shared/env.sh` in that shell. Add it to the job script, or run it after `srun ... --pty bash`. Do not `pip install torch`. |
 | The model will not load on the login node (killed, or out of memory) | The login node has 512 MB of RAM. Run through `srun` or `sbatch`. |
 | `CUDA out of memory` | Your run needs more GPU memory than the L4 has (about 23 GB), or an earlier process is still holding it. Reduce `--max-tokens` or the prompt length, and check that you do not start two model processes at once in the same job. |
-| `Disk quota exceeded` | You wrote large files into your home directory (venv, model downloads, logs, checkpoints). Check with `du -sh ~/* ~/.[!.]* 2>/dev/null \| sort -h \| tail`, delete what you do not need, and use the shared environment instead of your own. |
+| `Disk quota exceeded` (500 MB soft / 1 GB hard) | You wrote large files into your home directory (venv, model downloads, logs, checkpoints). Check with `du -sh ~/* ~/.[!.]* 2>/dev/null \| sort -h \| tail`, delete what you do not need, and use the shared environment instead of your own. |
 | No `hw1-<jobid>.out` file | The job has not started yet (still `PD`), or you are looking in the wrong directory. The file is created in the directory where you ran `sbatch`. Check `squeue -u $USER`, and `ls` in that directory. |
 | A script or output I wrote in `/tmp` is missing | `/tmp` is local to each machine. Keep files under your home directory. |
 | `git` says `Permission denied (publickey)` inside a job | Jobs do not have your forwarded SSH key. Run git on the login node. See [git-on-the-server.md](git-on-the-server.md). |

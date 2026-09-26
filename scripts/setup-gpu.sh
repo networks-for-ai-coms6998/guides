@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # scripts/setup-gpu.sh: end-to-end setup of a personal GPU VM on your own
-# GCP account, for coursework that needs real GPU access before the
-# course's own GPU capacity is ready (see ../gcp-personal-gpu.md).
+# GCP account, for coursework that needs a GPU of your own, in addition to the
+# shared course GPU (see ../gcp-personal-gpu.md).
 #
 # Prerequisites (see ../gcp-personal-gpu.md for the how-to on each):
 #   1. A Google Cloud account with the $300 free-trial credit redeemed.

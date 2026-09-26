@@ -20,7 +20,7 @@ Use these checks to make sure that:
 
 Your repository is named `<assignment>-<uni>` and lives in the
 `networks-for-ai-coms6998-hw` organization on GitHub, for example
-`hw1-abc1234`. See the [Homework Workflow Guide](homework_workflow.md) for how
+`hw1-abc1234`. See [Using git on the server](git-on-the-server.md) for how
 to clone it and work in it.
 
 Each assignment README states its deadline (for example, HW1 is due Thursday,

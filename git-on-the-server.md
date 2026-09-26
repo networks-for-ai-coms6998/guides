@@ -162,7 +162,7 @@ See [slurm-gpu.md](slurm-gpu.md) for how jobs work.
 | `Permission denied (publickey)` inside `sbatch` or `srun` | Expected. Jobs have no forwarded key. Run `git` on the login node. |
 | The push is rejected after the deadline | The repo is locked. Pushes after the deadline do not count, whether or not GitHub accepts them. |
 | `Your branch is behind` or a rejected non-fast-forward push | Run `git pull`, resolve any conflicts, and push again. |
-| `Disk quota exceeded` while cloning | Your home directory is full (1 GB soft / 2 GB hard). Delete large files you do not need. See [slurm-gpu.md](slurm-gpu.md). |
+| `Disk quota exceeded` while cloning | Your home directory is full (500 MB soft / 1 GB hard). Delete large files you do not need. See [slurm-gpu.md](slurm-gpu.md). |
 
 ## Fallback: no agent forwarding
 

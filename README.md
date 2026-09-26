@@ -17,10 +17,9 @@ working with your homework repositories.
 
 ## Homework and Git
 
--   [Homework workflow](homework_workflow.md): how assignments are created,
-  worked on, and submitted.
--   [Submission checklist](submission.md): confirm that your push is what we grade.
--   [Git](git.md): an introduction to Git.
+- [Submission checklist](submission.md): confirm that your push is what we grade.
+- [Git](git.md): an introduction to Git.
+- [Vim](vim-notes.pdf): a short Vim guide, handy for editing on the server.
 
 ## Optional
 

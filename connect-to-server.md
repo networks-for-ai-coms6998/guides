@@ -90,7 +90,7 @@ account.
 ## Rules of the road
 
 -   No `sudo`. Your home directory is private to you.
--   Disk quota: 1 GB soft / 2 GB hard. Do not install large packages
+-   Disk quota: 500 MB soft / 1 GB hard. Do not install large packages
   (for example your own copy of PyTorch); a shared environment is
   provided, see [slurm-gpu.md](slurm-gpu.md).
 -   Each user is limited to 1 CPU, 512 MB of RAM and 100 processes on the
@@ -129,7 +129,7 @@ scp -r .\my-project cs6998:~/
 `rsync` is not included with Windows; use `scp -r`, or run `rsync`
 inside WSL.
 
-Mind your 1 GB quota when copying data over.
+Mind your 500 MB quota when copying data over.
 
 ## VS Code Remote-SSH
 
@@ -162,6 +162,6 @@ never in the VS Code terminal on the login node.
 -   **Handle is wrong in the sign-up form.** Message the instructors
   privately on Ed (see above).
 -   **Disk full.** Check usage
-  with `du -sh ~` and remove large files; the hard limit is 2 GB.
+  with `du -sh ~` and remove large files; the hard limit is 1 GB.
 -   Still stuck? Post on Ed with the output of `ssh -v cs6998` (it does
   not contain your private key), preferably in public.

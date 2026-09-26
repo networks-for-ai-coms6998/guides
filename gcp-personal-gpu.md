@@ -14,7 +14,7 @@ workloads like HW1's inference profiling.
 This is entirely on your own personal account, not the course's: it is not
 required, the course does not pay for it, and the course staff cannot manage
 or debug your cloud account. Assignments must still be submitted through your
-GitHub repository as described in the [Homework Workflow Guide](homework_workflow.md).
+GitHub repository as described in [Using git on the server](git-on-the-server.md) and [Submission](submission.md).
 
 ## What you need to do by hand
 
