@@ -1,191 +1,155 @@
 # Git Tutorial
 
-Git is a source code version control system. Such a system is most
-useful when you work in a team, but even when you’re working alone,
-it’s a very useful tool to keep track of the changes you have made to
-your code.
+Git is a source code version control system. It is most useful when you work
+in a team, but even when you are working alone it is a very useful tool for
+keeping track of the changes you have made to your code.
 
-In this class, you are required to use Git for doing your homework
-assignments. You will use Git not only for coding
-your homeworks, but also for cloning the assignment repos and
-submitting your code.
+In this course you use Git and GitHub for your assignments: you get your
+starter code from a repository that the teaching staff creates for you, you
+commit your work to it, and you submit by pushing to it. See the
+[Homework Workflow Guide](homework_workflow.md) for how that works end to end.
+This guide covers the Git basics you need.
 
-This tutorial covers not only the basic git operations that you need,
-but also the workflow between you and the TAs -- from our
-preparation of an assignment all the way to the grading of your
-submissions by the TAs. Even if you are already familiar with git,
-you may find the description of the workflow helpful.
+## Configure your Git environment
 
-## Set `EDITOR` environment variable
-
-Type `echo $EDITOR`. If the shell does not respond with the name of
-your editor -- vim, emacs, or nano -- add the following line at the end of
-the `.bashrc` file in your home directory:
-
-```bash
-export EDITOR=your_choice_of_editor
-```
-
-After saving your `.bashrc` file, run `source ~/.bashrc`
-in the command line to make sure that your modification
-to `.bashrc` has taken effect.
-
-## Configure your git environment
-
-Tell git your name and email:
+Tell Git your name and email:
 
 ```bash
 git config --global user.name "Your Full Name"
-git config --global user.email your_uni@columbia/barnard.edu
+git config --global user.email your_uni@columbia.edu
 ```
 
-git stores this information in `~/.gitconfig`
+Git stores this information in `~/.gitconfig`. If you commit from the course
+server, see [Git on the server](git-on-the-server.md) for anything specific to
+that machine.
+
+Optionally, set the editor Git opens for commit messages (vim, emacs, nano,
+or `code --wait` for VS Code):
+
+```bash
+git config --global core.editor nano
+```
 
 ## Creating a project
 
-Let’s create a new directory, `~/tmp/test1`, for our first git project.
+Let's create a new directory, `~/tmp/test1`, for a practice project.
 
 ```bash
-cd
-mkdir tmp
-cd tmp
-mkdir test1
-cd test1
+mkdir -p ~/tmp/test1
+cd ~/tmp/test1
 ```
 
-Put the directory under git revision control:
+Put the directory under Git revision control:
 
 ```bash
 git init
 ```
 
-**Important note:** `git init` should only be executed when setting up a new git repository. You should never run `git init` inside cloned homework repositories.
+**Important note:** `git init` should only be executed when setting up a new
+repository. You should never run `git init` inside a cloned assignment
+repository.
 
-A git repository exists alongside the normal file system. It allows us to track the changes that we make to files, but only in the directory you've initialized it in and subdirectories. This means, for example, that you could create another git repository in `~/tmp/test2`, and the two repositories would have nothing to do with each other.```
-If you type `ll` (I’ll assume that `ll` is an alias for `ls -alF`), you will
-see that there is a `.git` directory. The git repository for the
-current directory is stashed in the `.git` directory.
+A Git repository exists alongside the normal file system. It tracks changes to
+files in the directory you initialized it in and its subdirectories. You could
+create another repository in `~/tmp/test2`, and the two repositories would
+have nothing to do with each other.
 
-Let’s start our programming project. Write `hello.c` with your editor:
+If you run `ls -a`, you will see a `.git` directory. The repository for the
+current directory is stored there.
 
-```c
-#include <stdio.h>
-int main()
-{
-    printf("%s\n", "hello world");
-    return 0;
-}
+Let's start a tiny Python project. Create `hello.py` with your editor:
+
+```python
+print("hello world")
 ```
 
-Compile and run it:
+Run it:
 
 ```bash
-gcc hello.c
-./a.out
+python3 hello.py
 ```
 
-Let’s see what git thinks about what we’re doing:
+Let's see what Git thinks about what we are doing:
 
 ```bash
 git status
 ```
 
-The `git status` command reports that `hello.c` and `a.out` are "Untracked".
-We can have git track `hello.c` by adding it to the "staging" area (more
-on this later):
+`git status` reports that `hello.py` is "Untracked". We can have Git track it
+by adding it to the "staging area" (more on this later):
 
 ```bash
-git add hello.c
+git add hello.py
 ```
 
-Run `git status` again. It now reports that `hello.c` is "a new file to
-be committed." Let’s commit it:
+Run `git status` again. It now reports that `hello.py` is "a new file to be
+committed." Let's commit it:
 
 ```bash
 git commit
 ```
 
-Git opens up your editor for you to type a commit message. A commit
-message should succinctly describe what you’re committing in the first
-line. If you have more to say, follow the first line with a blank
-line, and then with a more thorough multi-line description.
+Git opens your editor for you to type a commit message. A commit message
+should succinctly describe what you are committing in the first line. If you
+have more to say, follow the first line with a blank line and then a more
+thorough description.
 
-For now, type in the following one-line commit message, save, and exit
-the editor: `Added hello-world program`
-You can also do this in a one-line command with the `-m` flag. `-m`. specifies the commit message without opening a text editor:
+For now, type in the one-line message `Added hello-world program`, save, and
+exit the editor. You can also do this in one command with `-m`, which gives
+the message directly without opening an editor:
 
 ```bash
 git commit -m "Added hello-world program"
 ```
 
-Run `git status` again. It now reports that only `a.out` is untracked.
-It has no mention of `hello.c`. When git says nothing about a file, it
-means that it is being tracked, and that it has not changed since it
-has been last committed.
+Run `git status` again. When Git says nothing about a file, it means the file
+is tracked and has not changed since it was last committed.
 
-We have successfully put our first coding project under git revision
-control.
+We have successfully put our first project under Git revision control.
 
 ## Modifying files
 
-Modify `hello.c` to print "bye world" instead, and run `git status`. It
-reports that the file is "Changed but not updated." This means that
-the file has been modified since the last commit, but it is still not
-ready to be committed because it has not been moved into the staging
-area. In git, a file must first go to the staging area before it can
-be committed.
+Modify `hello.py` to print "bye world" instead, and run `git status`. It
+reports that the file is "Changes not staged for commit." This means the file
+has been modified since the last commit, but it is not ready to be committed
+because it has not been moved into the staging area. In Git, a change must
+first go to the staging area before it can be committed.
 
-Before we move it to the staging area, let’s see what we changed in
-the file:
+Before we stage it, let's see what we changed:
 
 ```bash
 git diff
 ```
 
-Or, if your terminal supports color,
-
-```bash
-git diff --color
-```
-
-The output should tell you that you took out the "hello world" line,
-and added a "bye world" line, like this:
+The output should tell you that you took out the "hello world" line and added
+a "bye world" line, like this:
 
 ```diff
-- printf("%s\n", "hello world");
-+ printf("%s\n", "bye world");
+-print("hello world")
++print("bye world")
 ```
 
-We move the file to the staging area with git add command:
+Stage the change with `git add`:
 
 ```bash
-git add hello.c
+git add hello.py
 ```
 
-In git, "add" means this: move the change you made to the staging
-area. The change could be a modification to a tracked file, or it
-could be a creation of a brand new file. This is a point of confusion
-for those of you who are familiar with other version control systems
-such as Subversion.
+In Git, "add" means: move the change you made to the staging area. The change
+could be a modification to a tracked file or the creation of a brand new file.
 
-At this point, `git diff` will report no change. Our change -- from
-hello to bye -- has been moved into staging already. So this means that
-`git diff` reports the difference between the staging area and the
-working copy of the file.
-
-To see the difference between the last commit and the staging area,
-add `--cached` option:
+At this point, `git diff` reports no change, because `git diff` reports the
+difference between the staging area and the working copy. To see the
+difference between the last commit and the staging area, add `--cached`:
 
 ```bash
 git diff --cached
 ```
 
-Let’s commit our change. If your commit message is a one-liner, you
-can skip the editor by giving the message directly as part of the git
-commit command:
+Let's commit the change:
 
 ```bash
-git commit -m "changed hello to bye"
+git commit -m "Changed hello to bye"
 ```
 
 To see your commit history:
@@ -194,52 +158,54 @@ To see your commit history:
 git log
 ```
 
-You can add a brief summary of what was done at each commit:
+Useful variations:
 
 ```bash
-git log --stat --summary
-```
-
-Or you can see the full diff at each commit:
-
-```bash
-git log -p
-```
-
-And in color:
-
-```bash
-git log -p --color
+git log --oneline       # one line per commit
+git log --stat          # which files changed in each commit
+git log -p              # the full diff of each commit
 ```
 
 ## The tracked, the modified, and the staged
 
-A file in a directory under git revision control is either tracked or
-untracked. A tracked file can be unmodified, modified but unstaged,
-or modified and staged. Confused? Let’s try again.
-
-There are four possibilities for a file in a git-controlled directory:
+A file in a directory under Git revision control is in one of four states:
 
 1.  Untracked
-
-    - Object files and executable files that can be rebuilt are usually not tracked.
-
+    -   Files that should not be in the repository, such as virtual
+      environments, model weights, datasets, and generated output, are
+      usually left untracked (see [`.gitignore`](#ignoring-files) below).
 1.  Tracked, unmodified
-    - The file is in the git repository, and it has not been modified since the last commit. `git status` says nothing about the file.
-
+    -   The file is in the repository and has not been modified since the last
+      commit. `git status` says nothing about it.
 1.  Tracked, modified, but unstaged
-
-    - You modified the file, but didn’t `git add` the file. The change has not been staged, so it’s not ready for commit yet.
-
+    -   You modified the file but did not `git add` it, so it is not ready for
+      commit yet.
 1.  Tracked, modified, and staged
-
-    - You modified the file, and did `git add` the file. The change has been moved to the staging area. It is ready for commit.
+    -   You modified the file and ran `git add`. The change is in the staging
+      area, ready for commit.
 
 The staging area is also called the "index".
 
-## Other useful git commands
+## Ignoring files
 
-Here are some more git commands that you will find useful.
+Some files should never be committed: your virtual environment (`.venv/`),
+Python caches (`__pycache__/`), downloaded model weights, large datasets, and
+anything secret such as tokens or API keys. List patterns for them in a file
+named `.gitignore` at the root of your repository:
+
+```text
+.venv/
+__pycache__/
+*.pt
+*.safetensors
+.env
+```
+
+Then `git add .gitignore` and commit it like any other file. Large files
+committed by accident bloat your repository, so check `git status` before you
+`git add .`.
+
+## Other useful Git commands
 
 To rename a tracked file:
 
@@ -253,48 +219,39 @@ To remove a tracked file from the repository:
 git rm filename
 ```
 
-The `mv` or `rm` actions are automatically staged for you, but you still
-need to `git commit` your actions.
+These are automatically staged for you, but you still need to `git commit`.
 
-Sometimes you make some changes to a file, but regret it, and want to
-go back to the version last committed. If the file has not been
-staged yet, you can do:
+To discard your uncommitted changes to a file and go back to the last
+committed version:
 
 ```bash
-git checkout -- filename
+git restore filename
 ```
 
-If the file has been staged, you must first unstage it:
+To unstage a file that you staged (keeping your edits):
 
 ```bash
-git reset HEAD filename
+git restore --staged filename
 ```
 
-There are two ways to display a manual page for a git command. For
-example, for the `git status` command, you can type one of the
-following two commands:
+To read the manual for a command:
 
 ```bash
 git help status
-man git-status
 ```
 
-Lastly, `git grep` searches for specified patterns in all files in the
-repository. To see all places you called `printf()`:
+To search for a pattern in all files in the repository:
 
 ```bash
-git grep printf
+git grep pattern
 ```
 
 ## Cloning a project
 
-You created a brand new project in the test1 directory, added a file,
-and modified the file. But more often than not, a programmer starts
-with an existing code base. When the code base is under git version
-control, you can \*clone\* the whole repository. This is in fact what
-you will do to start your homework assignments from my skeleton code.
-Let’s move up one directory, clone test1 into test2, and `cd` into the
-test2 directory:
+More often than not, you start from an existing code base. When the code base
+is under Git version control, you can _clone_ the whole repository. This is
+what you do to start each assignment from the starter code. Let's clone
+`test1` into `test2`:
 
 ```bash
 cd ..
@@ -302,138 +259,108 @@ git clone test1 test2
 cd test2
 ```
 
-Type `ll` to see that your `hello.c` file is cloned here. Moreover, if
-you run `git log`, you will see that the whole commit history is
-replicated here. `git clone` not only copies the latest version of
-the files, but also copies the entire repository, including the entire
-commit history. After cloning, the two repositories are
-indistinguishable.
+Run `ls` to see that `hello.py` is here. If you run `git log`, you will see
+that the whole commit history is replicated. `git clone` copies not only the
+latest version of the files but the entire repository, including its history.
 
-Let’s make some changes -- and let’s be bad. Edit `hello.c` to replace
-`printf` with `printf%^&`, save and commit:
+Let's make a change and commit it:
 
 ```bash
-vim hello.c
-git add hello.c
-git commit -m "hello world modification - work in progress"
+echo 'print("rock my world")' > hello.py
+git add hello.py
+git commit -m "Print rock my world"
 ```
 
-Now run `git log` to see your recent commit carrying on the commit
-history that was cloned. If you want to see only the commits after
-cloning:
+Run `git log` to see your commit on top of the cloned history. To see only the
+commits made since cloning:
 
 ```bash
-git log origin..
+git log origin/main..
 ```
 
-Of course you can add `-p` and `--color` to see the full diff in color:
-
-```bash
-git log -p --color origin..
-```
-
-Let’s make one more modification. Fix the `printf`, and perhaps change
-the "bye world" to "rock my world" while we’re there.
-
-```bash
-vim hello.c
-git add hello.c
-git commit -m "fixed typo & now prints rock my world"
-```
-
-Run `git log -p --color origin..` again to see the two commits you
-have made after cloning.
-
-## Adding a directory into your repository
-
-After the homework deadline, we will publish the solution by adding a subdirectory to the solution repository. Let’s simulate that
-process. Go into the original test1 directory, and make the solution
-subdirectory and create two files in it:
-
-```bash
-cd ../test1
-mkdir solution
-cd solution
-cp ../hello.c .
-echo 'hello:' > Makefile
-```
-
-Type `ll` to see that two files (`Makefile` and `hello.c`) have been created
-in the `solution` directory. (`hello.c` was copied from the parent
-directory, and Makefile was created directly on the command line using
-the echo command. BTW, the Makefile contains a single line, `hello:`.
-Can you see why this is a legitimate Makefile?)
-Now, move out of the solution directory, and `git add` and `git commit` the
-solution directory:
-
-```bash
-cd ..
-git add solution
-git commit -m "added solution"
-```
-
-Note that `git add solution` stages all files in the directory.
+(If your default branch is called `master` rather than `main`, use
+`origin/master..`.)
 
 ## Pushing commits to a remote repository
 
-The `git push` command takes two arguments:
-    A remote name, for example, origin
-    A branch name, for example, main
+The `git push` command takes a remote name (for example `origin`) and a branch
+name (for example `main`):
 
 ```bash
 git push origin main
 ```
 
-will do the job, and now your submission is on the remote server.
+This sends your new commits to the remote repository. For an assignment
+repository on GitHub, that is your submission. (You cannot practice this
+between the two local directories above, because Git refuses to push into the
+checked-out branch of another working copy.)
 
 ## Pulling changes from a remote repository
 
-Once you hear that the homework solution is available, you will want to
-retrieve it and take a look. You do that by "pulling" the changes in
-my repository into your repository. Let’s pull the changes we just
-made in `test1` into `test2`:
+To retrieve changes that were made in the remote repository since you cloned
+it, "pull" them:
 
 ```bash
-cd ../test2/
 git pull
 ```
 
-The `git pull` command looks at the original repository that you
-cloned from, fetches all the changes made since the cloning, and
-merges the changes into the current repository. You now have the
-solution right in your repository.
+`git pull` fetches all the changes made on the remote since your last pull and
+merges them into your current branch. Assignment READMEs tell you to run
+`git pull origin main` before you start, so that you have the latest
+instructions and starter code.
+
+## Working with GitHub
+
+Each assignment in this course lives in a private GitHub repository under the
+`networks-for-ai-coms6998-hw` organization, named `<assignment>-<uni>`, for
+example `hw1-abc1234`. To work on it, clone it over SSH:
+
+```bash
+git clone git@github.com:networks-for-ai-coms6998-hw/hw1-abc1234.git
+cd hw1-abc1234
+```
+
+For this to work you must have an SSH key registered with your GitHub account.
+See [GitHub SSH key setup](github-ssh-key.md). Once you have committed your
+work, `git push` sends it to GitHub, and you can confirm it arrived by looking
+at your repository on github.com.
 
 ## Branches
 
-With group assignments, we recommend that you push work to branches first, and then merge back into main once your group members have reviewed the code. As an example, suppose that you are working on a part of the assignment, you can create a branch separate from main by doing the following:
+A branch is an independent line of commits. For the individual assignments in
+this course you can simply work on `main`; that is the branch to push. If you
+work in a group (for example on the course project), we recommend pushing work
+to branches first and merging into `main` after your teammates have reviewed
+it:
 
-`$ git checkout main`
-`$ git checkout -b <branch-name>`
+```bash
+git switch main
+git switch -c <branch-name>
+```
 
-You can then commit your changes, and push to the branch by doing the following:
+Commit your changes, then push the branch:
 
-`$ git push origin <branch-name>`
+```bash
+git push -u origin <branch-name>
+```
 
-This will allow multiple members of the team to work on separate features in parallel. When the feature you are working on is complete, you may then create a pull request to allow your team members to review the code, and finally merge the changes back into master. You can read more about using branches and pull requests from [GitHub’s own documentation](https://help.github.com/articles/proposing-changes-to-your-work-with-pull-requests/).
+When the feature is complete, open a pull request on GitHub so your teammates
+can review the code, then merge it into `main`. See
+[GitHub's documentation on pull requests](https://docs.github.com/en/pull-requests)
+for details.
 
-## Learning more about git
+## Learning more about Git
 
-This tutorial covers everything you need to do your homework assignments.
-Git is an extremely powerful tool and a beautifully designed piece of
-software. If you want to learn more about it, start with the official
-git tutorial:
+This tutorial covers everything you need for the assignments. If you want to
+learn more, start with the official tutorial:
 
 ```bash
 man gittutorial
 ```
 
-There are pointers to further documentations at the end of the tutorial.
-
-The documentation page of the Git web site has many links as well:
-[http://git-scm.com/documentation](http://git-scm.com/documentation)
+The [Git documentation site](https://git-scm.com/doc) has many more links.
 
 ### Acknowledgments
 
-This guide was originally developed by Jae Woo Lee.
-
-Leslie Chang adapted it in Spring 23.
+This guide was originally developed by Jae Woo Lee, adapted by Leslie Chang in
+Spring 2023, and adapted for this course in Fall 2026.

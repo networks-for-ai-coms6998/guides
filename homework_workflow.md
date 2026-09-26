@@ -1,171 +1,214 @@
 # Homework Workflow Guide
 
-This guide walks you through setup, development, and submission for homework assignments in COMS 3157 Advanced Programming.
+This guide walks you through setup, development, and submission for the
+assignments in COMS 6998 Networks for AI. It applies to the reading responses
+and the homework assignments.
 
-> ⚠️ **Critical:** Your submission is your last Git commit before the deadline. Code that exists only on your local machine or the BSB server will **not** be graded.
+> **Critical:** Your submission is what is on GitHub in your assignment
+> repository when the deadline passes. Work that exists only on your laptop or
+> on the course server will **not** be graded.
 
-## Overview
-![Local &rarr; Remote Dev](assets/Local_Remote_Dev_V0526.png)
-![Homework Workflow](assets/HW_Flowchart_0526.png)
+## How assignments work
 
-## First-Time Setup
+-   Every assignment gets **one private GitHub repository per student**, named
+  `<assignment>-<uni>` (all lowercase), in the organization
+  `networks-for-ai-coms6998-hw`. For example, `hw1-abc1234` is the HW1
+  repository for the student with UNI `abc1234`.
+-   Each repository is created for you from a template that contains the
+  assignment README and any starter code. Read the README first: it is the
+  authority on what to submit, what to name your files, and the deadline.
+-   You submit by **pushing to your repository before the deadline**.
+-   The deadline is authoritative: pushes made after the deadline do not count,
+  even if GitHub still accepts them. Repositories are locked around or after
+  the deadline. There are **no extensions**, and the deadline is the same for
+  everyone.
+-   Each assignment's README states its own deadline. Reading responses are due
+  one hour before class begins (class meets Tuesdays at 6:10 PM Eastern, so
+  the deadline is Tuesday 5:10 PM Eastern). A successful push after the
+  deadline does not make your submission on time, so push early.
+-   Assignments other than the course project are individual.
 
-Before starting your first homework, complete these one-time setup steps:
+Do not wait until the last minute to push your first commit. Push early,
+push often, and verify (see [Verify your submission](#verify-your-submission)).
 
-### 1. Set Up SSH Keys for GitHub
+## First-time setup
 
-You need SSH keys configured on both the BSB server and your local VM (if using one) to push/pull from GitHub without entering your password every time.
+Complete these one-time steps before your first assignment.
 
-```bash
-# On BSB server (and optionally your local VM)
-ssh-keygen -t ed25519 -C "your_email@columbia.edu"
-cat ~/.ssh/id_ed25519.pub
-```
+### 1. Set up an SSH key for GitHub
 
-Copy the output and add it to your GitHub account under **Settings → SSH and GPG Keys → New SSH Key**.
+You need an SSH key registered with your GitHub account to clone and push over
+SSH. Follow [GitHub SSH key setup](github-ssh-key.md). If you also want to
+push from the course server, see [Git on the server](git-on-the-server.md).
 
-For detailed instructions, see the [SSH Guide](ssh.md).
-
-### 2. (Optional) Set Up a Local Development Environment
-
-While all work can be done directly on the BSB server, some students prefer a local environment for editing code.
-
-Use this [VS Code with Docker Guide](https://github.com/cs3157-borowski/guides/blob/main/vscode_docker.md)
-
-> Note: VSCode cannot be run on the BSB server due to resource constraints.
-
-## Starting Each Homework
-
-### 1. Clone the Homework Repository
-
-```bash
-# On BSB server
-git clone git@github.com:cs3157-borowski-hw/hwX-teamN.git
-cd hwX-teamN
-```
-
-Replace `X` with the homework number and `N` with your team number.
-
-### 2. (Optional) Clone to Your Local VM
-
-If you're using Docker for local development:
+### 2. Configure Git
 
 ```bash
-# On your local VM
-git clone git@github.com:cs3157-borowski-hw/hwX-teamN.git
+git config --global user.name "Your Full Name"
+git config --global user.email your_uni@columbia.edu
 ```
 
-## Development Cycle
+New to Git? Read the [Git Guide](git.md).
 
-Before you begin writing any code, start by understanding the problem. 
-1. Outline the Logic - Break the homework problem into parts.
-2. Map the Algorithm - Plan your solution before writing down code; could be in pseudocode or plain English--whatever works for you.
-3. Start writing code - Implement part by part, and test every part individually.
+### 3. Decide where you will work
 
-Follow this cycle as you work on your homework:
+You can develop wherever is convenient:
 
-### Pull → Code → Commit → Push → Test
+-   **Your own machine.** Fine for writing code, running on CPU, and writing
+  your report. HW1 requires Python 3.10+ and uses a virtual
+  environment; check each assignment README for exact requirements and setup
+  commands.
+-   **The course server** (`mv.cs.columbia.edu`), for CPU work and for queuing
+  GPU jobs. See [Connecting to the course server](connect-to-server.md) and
+  [Using the GPU with Slurm](slurm-gpu.md).
+-   **Your own cloud GPU**, optionally, using your own credit. See
+  [Using your own GCP GPU credit](gcp-personal-gpu.md).
 
-**1. Pull latest changes** (especially important for when working with teammates):
+If you like editing in VS Code, see the [VS Code and Docker guide](vscode_docker.md).
+
+## Starting each assignment
+
+### 1. Clone your assignment repository
+
+Once your repository exists, clone it (replace `hw1` and `abc1234` with the
+assignment and your UNI):
 
 ```bash
-git pull
+git clone git@github.com:networks-for-ai-coms6998-hw/hw1-abc1234.git
+cd hw1-abc1234
 ```
 
-**2. Make your changes**, then stage and commit:
+If you cannot find your repository on GitHub or cannot clone it, ask the
+teaching staff rather than creating one yourself.
+
+### 2. Read the README
+
+Read the assignment `README.md` in the root of the repository. It describes the
+task, the files to submit (for example `UNI-hw1-report.md`, with `UNI`
+replaced by your UNI), and the deadline.
+
+### 3. Pull the latest instructions
+
+Assignment READMEs may be updated after the repository is created. Before you
+start, and again from time to time, run:
 
 ```bash
-git add <files>
-git commit -m "Descriptive message of your changes" --author="Your Name <your_email>"
+git pull origin main
 ```
 
-**3. Push to GitHub:**
+## Development cycle
 
-```bash
-git push
-```
+Before you write any code, make sure you understand the problem. Break it into
+parts, plan your approach in pseudocode or plain English, then implement and
+test one part at a time. For measurement-heavy assignments, get a small,
+fast version of each experiment working before running the full sweep.
 
-**4. Test your code** on the BSB server and debug any issues.
+Follow this cycle as you work:
 
-**5. Design next steps** and repeat the cycle.
+### Pull, code, commit, push
 
-> 💡 **Tip:** Commit frequently with meaningful messages. This creates a clear history and makes it easier to identify when bugs were introduced.
+1.  Pull the latest changes (especially important if you work from more than
+   one machine):
 
-## Completing Your Homework
+    ```bash
+    git pull
+    ```
 
-![Completion Workflow](assets/Completion_of_Homework_Flowchart.png)
+1.  Make your changes, then stage and commit:
 
-Before submitting, follow this checklist:
+    ```bash
+    git add <files>
+    git commit -m "Descriptive message of your changes"
+    ```
 
-### 1. Clean Up Your Code
+1.  Push to GitHub:
 
-- Remove debug print statements
-- Add comments explaining complex logic
-- Ensure consistent formatting
+    ```bash
+    git push
+    ```
 
-### 2. Run Local Tests
+1.  Run and test your code, then repeat.
 
-Test your code thoroughly on the BSB server:
+> **Tip:** Commit frequently with meaningful messages. This creates a clear
+> history and makes it easier to find when something broke.
 
-```bash
-ssh UNI@bsb.cs.columbia.edu
-cd hwX-teamN
-make        # or gcc commands as specified
-./your_program [test inputs]
-```
+Do not commit virtual environments, model weights, or large data files. See
+[Ignoring files](git.md#ignoring-files).
 
-### 3. Run Extensive Tests
+## Completing your assignment
 
-Use an LLM (ChatGPT, Claude, Gemini) to help generate comprehensive test cases, including edge cases. Test thoroughly on the BSB server—this is where your code will be graded.
+Before your final push, check:
 
-### 4. All Tests Passed?
+-   The deliverables listed in the README exist, with exactly the file names it
+  asks for.
+-   Your code runs from a clean checkout, following the setup steps in the
+  README.
+-   Your report includes the header information the README asks for (for
+  example your UNI, full name, GitHub handle, and date).
+-   Any figures or results the report refers to are committed alongside it.
+-   Debug output and dead code are removed.
 
-- **No:** Go back to debugging and fixing your code. Repeat until all tests pass.
-- **Yes:** Proceed to final submission.
-
-### 5. Push Your Final Submission
+Then commit and push:
 
 ```bash
 git add .
-git commit -m "hwX completed"
+git commit -m "hw1 final submission"
 git push
 ```
 
-> **Note:** The commit message doesn't have to be "hwX completed"—any descriptive message is fine.
+The commit message can be anything descriptive.
 
-## Quick Reference
+### Using LLMs
 
-| Task                | Command                                                     |
-| ------------------- | ----------------------------------------------------------- |
-| SSH into BSB server | `ssh UNI@bsb.cs.columbia.edu`                               |
-| Clone homework repo | `git clone git@github.com:cs3157-borowski-hw/hwX-teamN.git` |
-| Pull latest changes | `git pull`                                                  |
-| Stage changes       | `git add <files>` or `git add .`                            |
-| Commit changes      | `git commit -m "message" --author="Name <email>"`           |
-| Push to GitHub      | `git push`                                                  |
-| Check repo status   | `git status`                                                |
-| View commit history | `git log --oneline`                                         |
+The syllabus permits the use of large language models as writing or coding
+aids provided that:
 
-## Server Information
+1. all AI-assisted content is clearly labeled, and
+1. you can explain any submitted work in detail.
 
-- **Server URL:** `bsb.cs.columbia.edu`
-- **Username:** Your Columbia UNI
-- **Operating System:** Ubuntu 24.04.3
-- **Login command:** `ssh UNI@bsb.cs.columbia.edu`
+Presenting AI-generated content as original analysis without attribution is an
+honor code violation. See the Academic Integrity section of the syllabus for
+the authoritative wording. Follow the collaboration and LLM-use rules in the
+syllabus and each assignment README; LLM use is allowed if you disclose it
+and can explain your work.
 
-## Related Guides
+## Verify your submission
 
-- [Login Guide](login.md) – Introduction to the BSB server
-- [SSH Guide](ssh.md) – Setting up SSH keys
-- [Git Guide](git.md) – Git fundamentals
-- [VSCode on Multipass](multipass_vscode.md) – Local development setup for Mac
-- [Submission Clarifications](submission.md) – Confirming your submissions
-- [Valgrind Guide](valgrind.md) – Memory debugging
+After your final push, confirm it arrived. See
+[Submission Clarifications](submission.md) for the full checklist. In short,
+open your repository on github.com and check that the files, and the latest
+commit, are what you expect.
+
+## Quick reference
+
+| Task                    | Command                                                                       |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| Clone your repository   | `git clone git@github.com:networks-for-ai-coms6998-hw/<assignment>-<uni>.git` |
+| Get the latest README   | `git pull origin main`                                                        |
+| Check repository status | `git status`                                                                  |
+| Stage changes           | `git add <files>` or `git add .`                                              |
+| Commit changes          | `git commit -m "message"`                                                     |
+| Push to GitHub          | `git push`                                                                    |
+| View commit history     | `git log --oneline`                                                           |
+| Log in to course server | `ssh <uni>@mv.cs.columbia.edu` (see [connect guide](connect-to-server.md))    |
+
+## Related guides
+
+- [Connecting to the course server](connect-to-server.md)
+- [GitHub SSH key setup](github-ssh-key.md)
+- [Git Guide](git.md)
+- [Git on the server](git-on-the-server.md)
+- [Using the GPU with Slurm](slurm-gpu.md)
+- [Submission Clarifications](submission.md)
+- [VS Code and Docker](vscode_docker.md)
+- [Using your own GCP GPU credit](gcp-personal-gpu.md)
 
 ---
 
-_Remember: Only code pushed to GitHub before the deadline will be graded. When in doubt, push your work!_
+_Remember: only work pushed to GitHub before the deadline will be graded. When
+in doubt, push your work early._
 
 ### Acknowledgments
 
-This guide has been developed by TA Amit Aharoni in Spring 2026, and updated in Summer 2026.
+This guide was developed by TA Amit Aharoni in Spring 2026, updated in Summer
+2026, and adapted for COMS 6998 in Fall 2026.

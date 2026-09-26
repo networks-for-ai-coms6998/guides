@@ -1,13 +1,20 @@
-# Using Your Own GCP GPU Credit (Temporary, While Course GPU Access Is Pending)
+# Using Your Own GCP GPU Credit (Optional)
 
-The course server (`mv.cs.columbia.edu`) does not have a GPU yet, and
-getting one added is in progress (a request to CS department IT). Until
-that lands, you can use your **own personal Google Cloud account's $300
-free-trial credit** to run real GPU workloads for coursework like HW1's
-transformer-inference profiling.
+The course server (`mv.cs.columbia.edu`) has a GPU that you can use through
+Slurm; see [Using the GPU with Slurm](slurm-gpu.md). That is the default way
+to run GPU work for this course, and you do not need anything in this guide to
+complete the assignments.
 
-This is entirely on your own personal account, not the course's — nothing
-here needs course staff involvement.
+This guide is an **optional alternative** for when you want a GPU of your own:
+for example to experiment without waiting in the Slurm queue, to try a larger
+GPU, or to keep a GPU environment you fully control. You can use your **own
+personal Google Cloud account's $300 free-trial credit** to run real GPU
+workloads like HW1's inference profiling.
+
+This is entirely on your own personal account, not the course's: it is not
+required, the course does not pay for it, and the course staff cannot manage
+or debug your cloud account. Assignments must still be submitted through your
+GitHub repository as described in the [Homework Workflow Guide](homework_workflow.md).
 
 ## What you need to do by hand
 
@@ -52,12 +59,12 @@ read that explanation, it covers the cost warnings you need.**
 
 If your GPU quota comes back as zero, the script will stop and tell you
 exactly what to do (this almost always means upgrading from the free
-trial to a paid Cloud Billing account first — **this does not charge you
-anything**, it just removes the free-trial GPU-quota block and preserves
-your $300 credit — then requesting GPU quota, which can take 1-2 business
-days). Re-run the script once that's done.
+trial to a paid Cloud Billing account first — upgrading does not charge you
+by itself and should keep your remaining credit, but any usage beyond the
+credit or trial is billed — then requesting GPU quota, which can
+take a few business days). Re-run the script once that's done.
 
-**⚠️ Important:** Once the VM is created, it bills by the hour whether or not you're using it — make sure to stop or delete it when you're done (see below).
+**Important:** Once the VM is created, it bills by the hour whether or not you're using it — make sure to stop or delete it when you're done (see below).
 
 ## Turn it off the moment you're done — this is the part that matters
 
@@ -71,7 +78,7 @@ a GPU instance running overnight or over a weekend by accident.
 -   If you're fully done with it: `bash scripts/delete-gpu-vm.sh` — this
     removes the disk too, so nothing keeps billing.
 
-When in doubt, delete it — recreating it later takes under two minutes.
+When in doubt, delete it — recreating it later usually takes only a few minutes.
 
 ## At the end of the semester
 
