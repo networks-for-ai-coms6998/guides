@@ -1,15 +1,27 @@
-# COMS 3157 Guides
+# COMS 6998 Guides
 
-This repository is a collection of guides for Advanced Programming (COMS 3157)
-developed by the TAs for Prof. Brian Borowski's offering of the course.
+Guides for **COMS 6998: Networks for AI** (Columbia, Fall 2026), written by the
+teaching staff. They cover getting onto the course server, running GPU jobs, and
+working with your homework repositories.
 
+## Start here
 
-## Programming Enviroment
+1.  [SSH keys and GitHub](github-ssh-key.md): create a key, add it to GitHub, and
+   set up `~/.ssh/config` (macOS and Windows).
+2.  [Connecting to the course server](connect-to-server.md): log in to
+   `mv.cs.columbia.edu`, copy files, and fix common login problems.
+3.  [Using git on the server](git-on-the-server.md): clone, pull, and push your
+   private repos from the server with no tokens to manage.
+4.  [Running GPU jobs with Slurm](slurm-gpu.md): the shared GPU, the shared
+   Python environment, `srun`, `sbatch`, and the job limits.
 
-- [Login](login.md): Introduction and access to the BSB server.
-- [SSHing into bb](ssh.md): setup ssh keys to login to BSB server without password.
-- [Git](git.md): Introduction to Git.
-- [Vim](vim-notes.pdf): Vim Guide
-- [Valgrind](valgrind.md): Understanding Valgrind Messages
-- [Submission Clarifications](submission.md): Confirming your HW Submissions
-- [Using Your Own GCP GPU Credit](gcp-personal-gpu.md): Run real GPU workloads on your personal GCP account while the course server's own GPU access is pending.
+## Homework and Git
+
+- [Submission checklist](submission.md): confirm that your push is what we grade.
+- [Git](git.md): an introduction to Git.
+- [Vim](vim-notes.pdf): a short Vim guide, handy for editing on the server.
+
+## Optional
+
+-   [Using your own GCP GPU credit](gcp-personal-gpu.md): run GPU workloads on
+  your personal Google Cloud account instead of the shared course GPU.

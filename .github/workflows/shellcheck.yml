@@ -7,7 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  bash-3.2-compat:
+  bash-3-2-compat:
+    name: bash 3.2 compat
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
