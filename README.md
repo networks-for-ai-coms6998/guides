@@ -21,6 +21,12 @@ working with your homework repositories.
 - [Git](git.md): an introduction to Git.
 - [Vim](vim-notes.pdf): a short Vim guide, handy for editing on the server.
 
+## Final project
+
+-   [Proposal LaTeX template](project-proposal/proposal-template.tex): or
+  [open it in Overleaf](https://www.overleaf.com/docs?snip_uri=https://raw.githubusercontent.com/networks-for-ai-coms6998/guides/main/project-proposal/proposal-template.tex&engine=pdflatex)
+  as a new project (sign in with your Columbia account first).
+
 ## Optional
 
 -   [Using your own GCP GPU credit](gcp-personal-gpu.md): run GPU workloads on

@@ -1,0 +1,77 @@
+% COMS 6998 Networks for AI -- Final project proposal template.
+% Aim for about 1-2 pages. The headings are a guide, not a strict form:
+% adapt them to your project. Submit the compiled PDF on Canvas.
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.2ex}{0.6ex}
+
+\title{\vspace{-2em}Your Project Title}
+\author{%
+  Group name: \textit{Your Group Name}\\[0.4em]
+  First Last (uni1) \quad First Last (uni2) \quad First Last (uni3) \quad First Last (uni4)}
+\date{COMS 6998 Networks for AI \quad Project Proposal \quad Fall 2026}
+
+\begin{document}
+\maketitle
+
+\section{Problem and Motivation}
+What question or problem are you tackling, and why does it matter for serving
+LLMs at scale? Connect it to at least one course topic (e.g., KV cache,
+disaggregation, speculative decoding, split or edge inference, VLMs).
+
+\section{Related Work}
+Two to four papers or systems your project builds on or differs from; course
+readings count. For example, DistServe~\cite{distserve} separates prefill and
+decode onto different GPUs.
+
+\section{Approach}
+What will you build, measure, model, or analyze? For an engineering project,
+describe the system and its main components. For a research project, state
+the hypothesis or design and how you will test it.
+
+\section{Evaluation Plan}
+What does success look like? List your metrics (e.g., latency, throughput,
+bandwidth, memory, accuracy), your baseline, and the workloads or models you
+will use.
+
+% Optional: a table of planned experiments.
+% \begin{tabular}{lll}
+%   \toprule
+%   Experiment & Metric & Baseline \\
+%   \midrule
+%   ... & ... & ... \\
+%   \bottomrule
+% \end{tabular}
+
+\section{Resources and Risks}
+Models, datasets, and compute you need (e.g., the course T4 GPU, CPU only,
+your own hardware). What is the biggest risk, and what is your fallback if it
+goes wrong?
+
+\section{Plan and Roles}
+Rough milestones up to the presentations, and who does what.
+
+\begin{itemize}
+  \item \textbf{Week of Oct 26:} ...
+  \item \textbf{Week of Nov 2:} ...
+  \item \textbf{Presentations:} ...
+\end{itemize}
+
+% References: add entries below and cite them with \cite{key}.
+\begin{thebibliography}{9}
+\small
+\bibitem{distserve}
+Y.~Zhong et al.
+\newblock DistServe: Disaggregating prefill and decoding for goodput-optimized
+  large language model serving.
+\newblock In \emph{OSDI}, 2024.
+\end{thebibliography}
+
+\end{document}
