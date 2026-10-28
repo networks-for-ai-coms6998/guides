@@ -1,7 +1,7 @@
 # Running GPU Jobs with Slurm
 
 The course server gives you a strong GPU for testing your homework, but
-there is exactly **one** NVIDIA L4 GPU for the whole class. To share it
+there is exactly **one** NVIDIA T4 GPU for the whole class. To share it
 fairly we use a job scheduler called **Slurm**. This guide explains what
 Slurm is, how to run your code on the GPU, and what to do when something
 goes wrong.
@@ -18,7 +18,7 @@ Two machines are involved:
     It is a small CPU-only machine that is up 24/7. Use it for editing,
     `git`, small tests, and submitting jobs. Each user is limited to
     1 CPU, 512 MB of RAM, and 100 processes there.
--   The **GPU machine** is a separate computer with the L4 GPU. **You never
+-   The **GPU machine** is a separate computer with the T4 GPU. **You never
     log in to it.** Instead you ask Slurm to run a command there for you.
 
 If all 40 students wanted the GPU at once and just logged in, they would
@@ -35,7 +35,7 @@ Do **not** create your own virtual environment and do **not** run
 `pip install torch`. PyTorch is several GB and will blow through your disk
 quota (500 MB soft, 1 GB hard); an attempt to install it fails part way and can leave
 your account over quota. A ready-made environment with `torch`,
-`transformers`, and the TinyLlama weights is shared by everyone. Load it
+`transformers`, and a few shared model weights (see "Available models" below) is shared by everyone. Load it
 with:
 
 ```bash
@@ -49,6 +49,49 @@ Note that the HW1 README suggests creating a venv and running
 `pip install -r code/requirements.txt`. On the course server, skip that and
 use the shared environment instead. (If you work on your own machine, the
 README instructions still apply.)
+
+## Available models
+
+The shared environment has an offline model cache, so models load by their
+Hugging Face repo id with no download and no quota use. To see what is
+installed, run this after `source /home/coms6998-shared/env.sh`:
+
+```bash
+ls $HF_HOME/hub
+```
+
+Each model appears as `models--<org>--<name>`; replace the `--` with `/` to
+get the repo id. Currently:
+
+| Repo id | Type | Size on GPU (fp16) |
+|---|---|---|
+| `TinyLlama/TinyLlama-1.1B-Chat-v1.0` | chat-tuned (the homework default) | about 2.2 GB |
+| `meta-llama/Llama-3.2-1B` | **base** (not instruction-tuned) | about 2.5 GB |
+| `meta-llama/Llama-3.2-3B` | **base** (not instruction-tuned) | about 6.4 GB |
+
+Use the model your assignment names. The Llama models are for projects that
+need them. Base models continue text rather than answer questions, so they
+will not follow chat-style prompts. Use of the Llama models is subject to
+Meta's Llama 3.2 license (`LICENSE.txt` in each model folder).
+
+Pick a model by passing its repo id, for example `--model meta-llama/Llama-3.2-3B`
+if your script takes that flag, or in code:
+
+```python
+AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-3B", dtype=torch.float16)
+```
+
+Notes:
+
+-   Always use `float16` (not `bfloat16`): the T4 GPU does not support bf16.
+-   The GPU has about 15 GB of memory, so a model larger than roughly 6B
+    parameters in fp16 will not fit. Llama-3.1-8B is deliberately not installed.
+-   Asking for a model that is not in the cache fails right away (the cache
+    is offline). You cannot download models into the shared cache; if you
+    need one, ask on Ed.
+-   Loading the 3B takes about a minute, so it eats into your 20-minute job limit.
+-   `llama-server` (llama.cpp) needs a GGUF file instead of a repo id. The only
+    one installed is `/home/coms6998-shared/gguf/tinyllama-1.1b-chat-v1.0-f16.gguf`.
 
 ## Interactive jobs: `srun`
 
@@ -140,9 +183,9 @@ If you started something by mistake, or a job is stuck, run
 
 ## Limits
 
--   **15 minutes maximum per job.** If you do not pass `--time`, the
+-   **20 minutes maximum per job.** If you do not pass `--time`, the
     default is **5 minutes**. A job that runs past its limit is killed.
--   Asking for more than 15 minutes is rejected at submit time with
+-   Asking for more than 20 minutes is rejected at submit time with
     `Requested time limit is invalid`. Lower `--time`.
 -   **No GPU jobs are scheduled between 1 and 7 a.m. ET.** Do not plan to
     run or wait for jobs overnight. Do not submit jobs that would still be
@@ -254,8 +297,8 @@ cat sweep-<jobid>.out
 ```
 
 Everything in one job must finish within its `--time`, and `--time`
-cannot exceed 15 minutes. Each run loads the model again, which costs
-some seconds, so keep the sweep small. If it does not fit in 15 minutes,
+cannot exceed 20 minutes. Each run loads the model again, which costs
+some seconds, so keep the sweep small. If it does not fit in 20 minutes,
 split it into several jobs (for example one job per algorithm) and
 submit them one after another.
 
@@ -281,11 +324,11 @@ your disk quota and do not belong in the repo.
 | --- | --- |
 | Job stays `PD` (pending) with reason `Resources` or `Priority` | Normal: the GPU is busy or others are ahead of you. Check `squeue` to see who is running. Wait, or cancel with `scancel <jobid>` and resubmit when it is quieter. Starting early helps. |
 | Job stays `PD` overnight | No GPU jobs are scheduled between 1 and 7 a.m. ET, and a job that would still be running at 1 a.m. will not be started. Do not plan to wait overnight; check `squeue` and `sinfo`, and resubmit a shorter job earlier in the day. |
-| `sbatch: error: ... Requested time limit is invalid` | `--time` is above the 15-minute maximum. Use `--time=00:15:00` or less. |
-| Job killed with `DUE TO TIME LIMIT` (in the `.out` file) | It hit its `--time`. The default without `--time` is only 5 minutes. Set `--time` explicitly (up to 15 minutes), or run a smaller test. |
+| `sbatch: error: ... Requested time limit is invalid` | `--time` is above the 20-minute maximum. Use `--time=00:20:00` or less. |
+| Job killed with `DUE TO TIME LIMIT` (in the `.out` file) | It hit its `--time`. The default without `--time` is only 5 minutes. Set `--time` explicitly (up to 20 minutes), or run a smaller test. |
 | `command not found: python`, or `ModuleNotFoundError: No module named 'torch'` | You did not run `source /home/coms6998-shared/env.sh` in that shell. Add it to the job script, or run it after `srun ... --pty bash`. Do not `pip install torch`. |
 | The model will not load on the login node (killed, or out of memory) | The login node has 512 MB of RAM. Run through `srun` or `sbatch`. |
-| `CUDA out of memory` | Your run needs more GPU memory than the L4 has (about 23 GB), or an earlier process is still holding it. Reduce `--max-tokens` or the prompt length, and check that you do not start two model processes at once in the same job. |
+| `CUDA out of memory` | Your run needs more GPU memory than the T4 has (about 15 GB), or an earlier process is still holding it. Reduce `--max-tokens` or the prompt length, and check that you do not start two model processes at once in the same job. |
 | `Disk quota exceeded` (500 MB soft / 1 GB hard) | You wrote large files into your home directory (venv, model downloads, logs, checkpoints). Check with `du -sh ~/* ~/.[!.]* 2>/dev/null \| sort -h \| tail`, delete what you do not need, and use the shared environment instead of your own. |
 | No `hw1-<jobid>.out` file | The job has not started yet (still `PD`), or you are looking in the wrong directory. The file is created in the directory where you ran `sbatch`. Check `squeue -u $USER`, and `ls` in that directory. |
 | A script or output I wrote in `/tmp` is missing | `/tmp` is local to each machine. Keep files under your home directory. |
